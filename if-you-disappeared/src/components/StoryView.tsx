@@ -186,13 +186,13 @@ function ListCard({ title, icon, items }: { title: string, icon: React.ReactNode
     <div className="vintage-plaque bg-white p-12 shadow-2xl border border-gold/10">
       <div className="flex items-center gap-4 mb-10 text-gold/80">
         {icon}
-        <h3 className="font-serif italic text-2xl tracking-wide">{title}</h3>
+        <h3 className="font-serif italic text-xl tracking-wide">{title}</h3>
       </div>
       <ul className="space-y-6">
         {items.map((item, i) => (
           <li key={i} className="flex items-start gap-4 text-black/70">
             <span className="block w-1.5 h-1.5 mt-2.5 rounded-full bg-gold/30 shrink-0" />
-            <span className="text-lg leading-relaxed font-serif italic">{item}</span>
+            <span className="text-base leading-relaxed font-serif italic">{item}</span>
           </li>
         ))}
       </ul>

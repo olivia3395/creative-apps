@@ -109,25 +109,14 @@ export default function Landing({ onGenerate, isLoading, lang }: LandingProps) {
       </header>
 
       <div className="w-full space-y-32">
-        {/* Ornamental Divider */}
-        <div className="flex justify-center">
-          <div className="w-24 h-8 opacity-20" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='30' viewBox='0 0 100 30'%3E%3Cpath d='M0,15 Q25,0 50,15 T100,15' fill='none' stroke='%23c5a059' stroke-width='1'/%3E%3Ccircle cx='50' cy='15' r='3' fill='%23c5a059'/%3E%3C/svg%3E")`, backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} />
-        </div>
-
         {/* Mood Input Section - Main Postcard Design */}
         <section className="max-w-4xl mx-auto w-full">
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.8, duration: 1 }}
-            className="ornamental-frame p-1 md:p-2 bg-white soft-halo"
+            className="postcard-card p-1 md:p-2 bg-white soft-halo border-gold/20"
           >
-            {/* Corner Decorations */}
-            <div className="corner-decoration corner-tl" />
-            <div className="corner-decoration corner-tr" />
-            <div className="corner-decoration corner-bl" />
-            <div className="corner-decoration corner-br" />
-
             <div className="border border-gold/10 p-8 md:p-12 flex flex-col gap-12 min-h-[300px] relative">
               {/* The Message */}
               <div className="flex-1 flex flex-col">
@@ -162,45 +151,29 @@ export default function Landing({ onGenerate, isLoading, lang }: LandingProps) {
         </section>
 
         {/* Diary Style Selection Grid - 3 Columns */}
-        <section className="w-full max-w-7xl mx-auto px-4">
-          <div className="relative bg-[#fdfaf3] shadow-2xl rounded-sm border border-gold/10 overflow-hidden cloud-edge min-h-[500px]">
-            {/* Notebook Binding Rings */}
-            <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-around py-12 z-20 pointer-events-none border-r border-gold/5">
-              {[...Array(15)].map((_, i) => (
-                <div key={i} className="flex items-center">
-                  <div className="w-8 h-2 bg-gradient-to-b from-ink/20 via-ink/40 to-ink/20 rounded-full -translate-x-4 shadow-[2px_2px_4px_rgba(0,0,0,0.1)]" />
-                  <div className="w-2 h-2 rounded-full bg-gold/10 -translate-x-2" />
-                </div>
-              ))}
-            </div>
-
+        <section className="w-full max-w-7xl mx-auto">
+          <div className="relative bg-[#fdfaf3] shadow-2xl rounded-sm border border-gold/10 overflow-hidden">
             {/* Journal Header Decoration */}
-            <div className="h-8 bg-ink/5 w-full border-b border-gold/5 flex items-center pl-16 pr-4 justify-between">
-              <div className="flex gap-2">
-                <div className="w-2 h-2 rounded-full bg-gold/20" />
-                <div className="w-2 h-2 rounded-full bg-gold/20" />
-                <div className="w-2 h-2 rounded-full bg-gold/20" />
-              </div>
-              <span className="text-[8px] uppercase tracking-[0.3em] text-ink/30 font-mono italic">Travel Journal // No. 2026</span>
+            <div className="h-4 bg-ink/5 w-full border-b border-gold/5 flex items-center px-4 gap-2">
+              <div className="w-2 h-2 rounded-full bg-gold/20" />
+              <div className="w-2 h-2 rounded-full bg-gold/20" />
+              <div className="w-2 h-2 rounded-full bg-gold/20" />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-gold/10 pl-12">
-              <div className="p-8 md:p-12 relative">
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px)', backgroundSize: '100% 2.5rem' }} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-gold/10">
+              <div className="p-8 md:p-12">
                 <DiarySelector title={t.mood} options={t.moodOptions} selected={selectedMood} onSelect={setSelectedMood} />
               </div>
-              <div className="p-8 md:p-12 bg-[#fcf8ef] relative">
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px)', backgroundSize: '100% 2.5rem' }} />
+              <div className="p-8 md:p-12 bg-[#fcf8ef]">
                 <DiarySelector title={t.tone} options={t.toneOptions} selected={selectedTone} onSelect={setSelectedTone} />
               </div>
-              <div className="p-8 md:p-12 relative">
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px)', backgroundSize: '100% 2.5rem' }} />
+              <div className="p-8 md:p-12">
                 <DiarySelector title={t.travelWith} options={t.travelWithOptions} selected={selectedTravelWith} onSelect={setSelectedTravelWith} />
               </div>
             </div>
 
             {/* Journal Footer Decoration */}
-            <div className="p-4 bg-ink/5 border-t border-gold/5 flex justify-between items-center pl-16">
+            <div className="p-4 bg-ink/5 border-t border-gold/5 flex justify-between items-center">
               <span className="text-[7px] uppercase tracking-[0.4em] text-ink/20 font-mono">Personal Narrative Log // Vol. 01</span>
               <div className="flex gap-1">
                 {[1,2,3,4,5].map(i => <div key={i} className="w-1 h-1 rounded-full bg-gold/10" />)}
@@ -232,7 +205,7 @@ export default function Landing({ onGenerate, isLoading, lang }: LandingProps) {
                         key={cityKey}
                         whileHover={{ scale: 1.02 }}
                         onClick={() => setSelectedPlace(isSelected ? "" : cityName)}
-                        className={`cinematic-card vintage-plaque p-8 cursor-pointer relative group ${
+                        className={`cinematic-card p-6 cursor-pointer relative group ${
                           isSelected ? 'active ring-2 ring-gold/40 rotate-1 scale-105 z-10' : ''
                         }`}
                       >
@@ -272,7 +245,7 @@ export default function Landing({ onGenerate, isLoading, lang }: LandingProps) {
             whileTap={{ scale: 0.98 }}
             onClick={handleGenerate}
             disabled={isLoading || (!moodText.trim() && !selectedMood)}
-            className="relative group px-24 py-10 bg-ink text-cream vintage-plaque text-xl font-serif italic tracking-[0.2em] overflow-hidden transition-all hover:shadow-[0_30px_60px_-15px_rgba(197,160,89,0.3)] disabled:opacity-20 disabled:hover:scale-100"
+            className="relative group px-24 py-8 bg-ink text-gold rounded-sm text-xl font-serif italic tracking-[0.2em] overflow-hidden transition-all hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] disabled:opacity-20 disabled:hover:scale-100"
           >
             <div className="absolute inset-0 bg-gold/10 -translate-x-full group-hover:translate-x-0 transition-transform duration-1000 ease-in-out" />
             <span className="relative z-10 flex items-center gap-4">
@@ -308,24 +281,18 @@ function DiarySelector({ title, options, selected, onSelect }: { title: string, 
             <button
               key={opt}
               onClick={() => onSelect(isSelected ? "" : opt)}
-              className={`group relative px-6 py-2 transition-all duration-500 text-sm md:text-base font-serif italic tracking-wide ${
+              className={`group relative px-4 py-1.5 rounded-full border transition-all duration-500 text-sm md:text-base font-serif italic ${
                 isSelected 
-                  ? 'text-ink scale-110' 
-                  : 'text-ink/40 hover:text-ink/60'
+                  ? 'bg-gold/10 border-gold text-ink shadow-[0_0_15px_rgba(197,160,89,0.1)]' 
+                  : 'border-ink/5 text-ink/40 hover:border-gold/30 hover:text-ink/60'
               }`}
             >
               <span className="relative z-10">{opt}</span>
-              {isSelected ? (
+              {isSelected && (
                 <motion.div 
-                  layoutId={`diary-active-bg-${title}`}
-                  className="absolute inset-0 bg-gold/10 -z-0"
-                  style={{ 
-                    borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%',
-                    border: '1px solid rgba(197, 160, 89, 0.2)'
-                  }}
+                  layoutId={`diary-active-dot-${title}`}
+                  className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-gold shadow-[0_0_8px_rgba(197,160,89,0.6)]"
                 />
-              ) : (
-                <div className="absolute bottom-1 left-4 right-4 h-[1px] bg-gold/20 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
               )}
             </button>
           );
