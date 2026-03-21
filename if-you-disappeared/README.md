@@ -61,6 +61,24 @@ It is about briefly living one.
 
 ![Destination Cards Europe](./assets/travel4.png)
 
+### Story Title and Opening Scene
+
+![Story Title and Opening Scene](./assets/travel5.png)
+
+### Scene Timeline
+
+![Scene Timeline](./assets/travel6.png)
+
+### Reflective Story Sections
+
+![Reflective Story Sections](./assets/travel7.png)
+
+### What Happens Next
+
+![What Happens Next](./assets/travel8.png)
+
+
+
 > Place the screenshots inside an `assets/` folder in your repo, or update the image paths if you store them elsewhere.
 
 
