@@ -120,26 +120,26 @@ function ChapterView({ chapter, index, lang }: { key?: React.Key, chapter: Story
       className="space-y-24"
     >
       <div className="text-center space-y-8 max-w-3xl mx-auto">
-        <h1 className="shimmer-text text-5xl md:text-7xl font-serif leading-tight">
+        <h1 className="shimmer-text text-4xl md:text-6xl font-serif leading-tight">
           {chapter.title}
         </h1>
-        <p className="text-2xl md:text-3xl font-serif italic text-black/70 leading-relaxed">
+        <p className="text-xl md:text-2xl font-serif italic text-black/70 leading-relaxed">
           "{chapter.openingLine}"
         </p>
       </div>
 
-      <div className="space-y-20 max-w-2xl mx-auto relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-[1px] before:bg-gradient-to-b before:from-transparent before:via-gold/20 before:to-transparent">
+      <div className="space-y-20 max-w-4xl mx-auto relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-[1px] before:bg-gradient-to-b before:from-transparent before:via-gold/20 before:to-transparent">
         {chapter.scenes?.map((scene, i) => (
           <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
             <div className="flex items-center justify-center w-10 h-10 rounded-full border border-gold/20 bg-cream text-gold shadow-2xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
               <div className="w-1.5 h-1.5 bg-gold rounded-full animate-pulse" />
             </div>
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-4rem)] p-8 vintage-plaque bg-white border border-gold/10 shadow-xl hover:border-gold/30 transition-all">
+            <div className="w-[calc(100%-4rem)] md:w-[calc(60%-4rem)] p-8 vintage-plaque bg-white border border-gold/10 shadow-xl hover:border-gold/30 transition-all">
               <div className="flex items-baseline gap-4 mb-4">
                 <span className="font-mono text-[10px] font-bold tracking-[0.3em] text-gold uppercase">{scene.time}</span>
                 <span className="text-xs font-medium text-black/40 uppercase tracking-widest">{scene.location}</span>
               </div>
-              <p className="text-xl leading-relaxed text-black/90 font-serif italic">
+              <p className="text-lg leading-relaxed text-black/90 font-serif italic">
                 {scene.content}
               </p>
             </div>
@@ -162,9 +162,9 @@ function ChapterView({ chapter, index, lang }: { key?: React.Key, chapter: Story
             
             <div className="flex items-center gap-4 mb-8 text-gold/60">
               <PenTool size={22} />
-              <h3 className="font-serif italic text-2xl tracking-wide">{t.youWroteDown}</h3>
+              <h3 className="font-serif italic text-xl tracking-wide">{t.youWroteDown}</h3>
             </div>
-            <p className="font-serif text-3xl leading-relaxed text-black italic handwritten">
+            <p className="font-serif text-2xl leading-relaxed text-black italic handwritten">
               "{chapter.youWroteDown}"
             </p>
           </div>
@@ -172,7 +172,7 @@ function ChapterView({ chapter, index, lang }: { key?: React.Key, chapter: Story
       </div>
 
       <div className="text-center max-w-3xl mx-auto pt-16">
-        <p className="text-3xl font-serif italic text-black/80 leading-relaxed">
+        <p className="text-2xl font-serif italic text-black/80 leading-relaxed">
           {chapter.endingLine}
         </p>
       </div>
