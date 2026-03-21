@@ -82,6 +82,13 @@ export default function App() {
             {error}
           </div>
         )}
+
+        <footer className="py-12 flex flex-col items-center gap-4 opacity-30">
+          <div className="w-12 h-[1px] bg-ink" />
+          <p className="text-[9px] uppercase tracking-[0.4em] font-medium text-ink text-center px-6">
+            © {new Date().getFullYear()} yuyao wang • yuyaow@bu.edu
+          </p>
+        </footer>
       </div>
     </div>
   );
