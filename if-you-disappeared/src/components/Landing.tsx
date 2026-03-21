@@ -44,7 +44,7 @@ export default function Landing({ onGenerate, isLoading, lang }: LandingProps) {
     { 
       id: 'usa', 
       label: t.regions.usa, 
-      items: ['ny', 'sf', 'chicago', 'miami', 'seattle', 'vegas', 'newOrleans', 'yellowstone', 'grandCanyon', 'yosemite'] 
+      items: ['ny', 'sf', 'chicago', 'miami', 'seattle', 'vegas', 'newOrleans', 'yellowstone', 'grandCanyon', 'yosemite', 'austin', 'denver'] 
     },
     { 
       id: 'china', 
@@ -54,17 +54,17 @@ export default function Landing({ onGenerate, isLoading, lang }: LandingProps) {
     { 
       id: 'europe', 
       label: t.regions.europe, 
-      items: ['france', 'italy', 'spain', 'iceland', 'greece', 'switzerland', 'berlin', 'amsterdam', 'prague', 'vienna', 'copenhagen'] 
+      items: ['france', 'italy', 'spain', 'iceland', 'greece', 'switzerland', 'berlin', 'amsterdam', 'prague', 'vienna', 'copenhagen', 'lisbon', 'stockholm', 'edinburgh', 'budapest'] 
     },
     { 
       id: 'southAmerica', 
       label: t.regions.southAmerica, 
-      items: ['brazil', 'argentina', 'peru', 'chile', 'colombia'] 
+      items: ['brazil', 'argentina', 'peru', 'chile', 'colombia', 'ecuador', 'uruguay', 'bolivia', 'paraguay'] 
     },
     { 
       id: 'others', 
       label: t.regions.others, 
-      items: ['tokyo', 'kyoto', 'paris', 'london', 'rome', 'sydney', 'melbourne', 'cairo', 'dubai', 'singapore', 'bangkok'] 
+      items: ['tokyo', 'kyoto', 'paris', 'london', 'rome', 'sydney', 'melbourne', 'cairo', 'dubai', 'singapore', 'bangkok', 'seoul', 'istanbul', 'marrakech', 'barcelona'] 
     }
   ];
 
