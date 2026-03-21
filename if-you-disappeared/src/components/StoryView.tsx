@@ -24,21 +24,15 @@ export default function StoryView({ chapters, onContinue, onRestart, isLoading, 
   }, [chapters]);
 
   return (
-    <div className="relative min-h-screen w-full bg-midnight text-cream">
+    <div className="relative min-h-screen w-full bg-cream text-black">
       {/* Background Overlay */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-midnight via-midnight/95 to-midnight" />
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gold-shimmer/10 blur-[120px] rounded-full" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-mist-blue/10 blur-[120px] rounded-full" />
-        </div>
-      </div>
+      <div className="fixed inset-0 z-0 misty-gradient" />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 py-24">
         <div className="flex justify-center mb-24">
           <button 
             onClick={onRestart}
-            className="text-mist-blue/30 hover:text-gold-shimmer transition-all text-[10px] uppercase tracking-[0.5em] font-bold"
+            className="text-black/30 hover:text-gold transition-all text-[10px] uppercase tracking-[0.5em] font-bold"
           >
             {t.startNew}
           </button>
@@ -52,24 +46,30 @@ export default function StoryView({ chapters, onContinue, onRestart, isLoading, 
 
         <div ref={endRef} className="pt-32 pb-40">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center space-y-6 text-mist-blue/40 py-12">
-              <div className="w-10 h-10 border border-gold-shimmer/20 border-t-gold-shimmer rounded-full animate-spin" />
+            <div className="flex flex-col items-center justify-center space-y-6 text-black/40 py-12">
+              <div className="w-10 h-10 border border-gold/20 border-t-gold rounded-full animate-spin" />
               <p className="font-serif italic text-xl tracking-wide">{lang === 'zh' ? "正在编织下一章..." : "Weaving the next scene..."}</p>
             </div>
           ) : (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-panel rounded-[2rem] p-10 md:p-16 border-cream/5 shadow-2xl"
+              className="ornamental-frame p-10 md:p-16 soft-halo"
             >
-              <h3 className="text-2xl font-serif mb-10 text-center italic text-cream/90">{t.continueTitle}</h3>
+              {/* Corner Decorations */}
+              <div className="corner-decoration corner-tl" />
+              <div className="corner-decoration corner-tr" />
+              <div className="corner-decoration corner-bl" />
+              <div className="corner-decoration corner-br" />
+
+              <h3 className="text-2xl font-serif mb-10 text-center italic text-black/90">{t.continueTitle}</h3>
               
               <div className="flex flex-wrap gap-3 justify-center mb-12">
                 {chapters[chapters.length - 1].suggestedFollowUps?.map((suggestion, i) => (
                   <button
                     key={i}
                     onClick={() => onContinue(suggestion)}
-                    className="px-6 py-3 rounded-full bg-cream/5 text-mist-blue/80 text-xs tracking-widest hover:bg-gold-shimmer/10 hover:text-gold-shimmer transition-all border border-cream/5"
+                    className="px-6 py-3 rounded-full bg-gold/5 text-black/80 text-xs tracking-widest hover:bg-gold/10 hover:text-black transition-all border border-gold/10"
                   >
                     {suggestion}
                   </button>
@@ -88,7 +88,7 @@ export default function StoryView({ chapters, onContinue, onRestart, isLoading, 
                     }
                   }}
                   placeholder={t.continuePlaceholder}
-                  className="w-full bg-cream/5 border border-cream/10 rounded-full py-5 pl-8 pr-16 text-cream focus:outline-none focus:border-gold-shimmer/40 focus:ring-0 transition-all placeholder:text-cream/10"
+                  className="w-full bg-gold/5 border border-gold/10 rounded-full py-5 pl-8 pr-16 text-black focus:outline-none focus:border-gold/40 focus:ring-0 transition-all placeholder:text-black/20"
                 />
                 <button
                   onClick={() => {
@@ -97,11 +97,10 @@ export default function StoryView({ chapters, onContinue, onRestart, isLoading, 
                       setCustomPrompt("");
                     }
                   }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-3 bg-gold-shimmer/20 text-gold-shimmer rounded-full hover:bg-gold-shimmer hover:text-midnight transition-all"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-3 bg-gold/10 text-gold rounded-full hover:bg-gold hover:text-cream transition-all"
                 >
                   <ArrowRight size={20} />
                 </button>
-                <div className="absolute -inset-2 -z-10 bg-gold-shimmer/5 blur-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-1000" />
               </div>
             </motion.div>
           )}
@@ -121,26 +120,26 @@ function ChapterView({ chapter, index, lang }: { key?: React.Key, chapter: Story
       className="space-y-24"
     >
       <div className="text-center space-y-8 max-w-3xl mx-auto">
-        <h1 className="text-glow text-5xl md:text-7xl font-serif leading-tight text-cream">
+        <h1 className="shimmer-text text-5xl md:text-7xl font-serif leading-tight">
           {chapter.title}
         </h1>
-        <p className="text-2xl md:text-3xl font-serif italic text-mist-blue/70 leading-relaxed">
+        <p className="text-2xl md:text-3xl font-serif italic text-black/70 leading-relaxed">
           "{chapter.openingLine}"
         </p>
       </div>
 
-      <div className="space-y-20 max-w-2xl mx-auto relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-[1px] before:bg-gradient-to-b before:from-transparent before:via-cream/10 before:to-transparent">
+      <div className="space-y-20 max-w-2xl mx-auto relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-[1px] before:bg-gradient-to-b before:from-transparent before:via-gold/20 before:to-transparent">
         {chapter.scenes?.map((scene, i) => (
           <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-cream/10 bg-midnight text-gold-shimmer shadow-2xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-              <div className="w-1.5 h-1.5 bg-gold-shimmer rounded-full animate-pulse" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-gold/20 bg-cream text-gold shadow-2xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+              <div className="w-1.5 h-1.5 bg-gold rounded-full animate-pulse" />
             </div>
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-4rem)] p-8 rounded-[2rem] bg-cream/5 backdrop-blur-xl border border-cream/5 shadow-xl hover:border-cream/10 transition-all">
+            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-4rem)] p-8 vintage-plaque bg-white border border-gold/10 shadow-xl hover:border-gold/30 transition-all">
               <div className="flex items-baseline gap-4 mb-4">
-                <span className="font-mono text-[10px] font-bold tracking-[0.3em] text-gold-shimmer uppercase">{scene.time}</span>
-                <span className="text-xs font-medium text-mist-blue/40 uppercase tracking-widest">{scene.location}</span>
+                <span className="font-mono text-[10px] font-bold tracking-[0.3em] text-gold uppercase">{scene.time}</span>
+                <span className="text-xs font-medium text-black/40 uppercase tracking-widest">{scene.location}</span>
               </div>
-              <p className="text-xl leading-relaxed text-cream/90 font-serif">
+              <p className="text-xl leading-relaxed text-black/90 font-serif italic">
                 {scene.content}
               </p>
             </div>
@@ -154,12 +153,18 @@ function ChapterView({ chapter, index, lang }: { key?: React.Key, chapter: Story
         <ListCard title={t.youPhotographed} icon={<Camera size={22} />} items={chapter.youPhotographed} />
         
         {chapter.youWroteDown && (
-          <div className="glass-panel rounded-[2.5rem] p-12 shadow-2xl flex flex-col justify-center border-gold-shimmer/10">
-            <div className="flex items-center gap-4 mb-8 text-gold-shimmer/60">
+          <div className="ornamental-frame p-12 shadow-2xl flex flex-col justify-center">
+            {/* Corner Decorations */}
+            <div className="corner-decoration corner-tl" />
+            <div className="corner-decoration corner-tr" />
+            <div className="corner-decoration corner-bl" />
+            <div className="corner-decoration corner-br" />
+            
+            <div className="flex items-center gap-4 mb-8 text-gold/60">
               <PenTool size={22} />
               <h3 className="font-serif italic text-2xl tracking-wide">{t.youWroteDown}</h3>
             </div>
-            <p className="font-serif text-3xl leading-relaxed text-cream italic text-glow">
+            <p className="font-serif text-3xl leading-relaxed text-black italic handwritten">
               "{chapter.youWroteDown}"
             </p>
           </div>
@@ -167,7 +172,7 @@ function ChapterView({ chapter, index, lang }: { key?: React.Key, chapter: Story
       </div>
 
       <div className="text-center max-w-3xl mx-auto pt-16">
-        <p className="text-3xl font-serif italic text-mist-blue/80 leading-relaxed">
+        <p className="text-3xl font-serif italic text-black/80 leading-relaxed">
           {chapter.endingLine}
         </p>
       </div>
@@ -178,16 +183,16 @@ function ChapterView({ chapter, index, lang }: { key?: React.Key, chapter: Story
 function ListCard({ title, icon, items }: { title: string, icon: React.ReactNode, items: string[] }) {
   if (!items || items.length === 0) return null;
   return (
-    <div className="glass-panel rounded-[2.5rem] p-12 shadow-2xl border-cream/5">
-      <div className="flex items-center gap-4 mb-10 text-gold-shimmer/80">
+    <div className="vintage-plaque bg-white p-12 shadow-2xl border border-gold/10">
+      <div className="flex items-center gap-4 mb-10 text-gold/80">
         {icon}
         <h3 className="font-serif italic text-2xl tracking-wide">{title}</h3>
       </div>
       <ul className="space-y-6">
         {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-4 text-cream/70">
-            <span className="block w-1.5 h-1.5 mt-2.5 rounded-full bg-gold-shimmer/30 shrink-0" />
-            <span className="text-lg leading-relaxed font-serif">{item}</span>
+          <li key={i} className="flex items-start gap-4 text-black/70">
+            <span className="block w-1.5 h-1.5 mt-2.5 rounded-full bg-gold/30 shrink-0" />
+            <span className="text-lg leading-relaxed font-serif italic">{item}</span>
           </li>
         ))}
       </ul>

@@ -245,7 +245,7 @@ export default function Landing({ onGenerate, isLoading, lang }: LandingProps) {
             whileTap={{ scale: 0.98 }}
             onClick={handleGenerate}
             disabled={isLoading || (!moodText.trim() && !selectedMood)}
-            className="relative group px-24 py-8 bg-ink text-cream rounded-sm text-xl font-serif italic tracking-[0.2em] overflow-hidden transition-all hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] disabled:opacity-20 disabled:hover:scale-100"
+            className="relative group px-24 py-8 bg-ink text-gold rounded-sm text-xl font-serif italic tracking-[0.2em] overflow-hidden transition-all hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] disabled:opacity-20 disabled:hover:scale-100"
           >
             <div className="absolute inset-0 bg-gold/10 -translate-x-full group-hover:translate-x-0 transition-transform duration-1000 ease-in-out" />
             <span className="relative z-10 flex items-center gap-4">
