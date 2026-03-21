@@ -153,19 +153,13 @@ function ChapterView({ chapter, index, lang }: { key?: React.Key, chapter: Story
         <ListCard title={t.youPhotographed} icon={<Camera size={22} />} items={chapter.youPhotographed} />
         
         {chapter.youWroteDown && (
-          <div className="ornamental-frame p-12 shadow-2xl flex flex-col justify-center">
-            {/* Corner Decorations */}
-            <div className="corner-decoration corner-tl" />
-            <div className="corner-decoration corner-tr" />
-            <div className="corner-decoration corner-bl" />
-            <div className="corner-decoration corner-br" />
-            
-            <div className="flex items-center gap-4 mb-8 text-gold/60">
+          <div className="vintage-plaque bg-white p-12 shadow-2xl border border-gold/10">
+            <div className="flex items-center gap-4 mb-10 text-gold/80">
               <PenTool size={22} />
               <h3 className="font-serif italic text-xl tracking-wide">{t.youWroteDown}</h3>
             </div>
-            <p className="font-serif text-2xl leading-relaxed text-black italic handwritten">
-              "{chapter.youWroteDown}"
+            <p className="text-base leading-relaxed text-black/70 font-serif italic">
+              {chapter.youWroteDown}
             </p>
           </div>
         )}
