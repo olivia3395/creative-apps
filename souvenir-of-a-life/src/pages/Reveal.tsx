@@ -1,0 +1,409 @@
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Loader2, Bookmark, BookmarkCheck, ArrowLeft } from 'lucide-react';
+import { generateSouvenir, GeneratedSouvenir, expandSouvenir } from '../lib/gemini';
+import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useLanguage } from '../contexts/LanguageContext';
+import { INQUIRIES } from '../lib/constants';
+
+export function Reveal() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { language } = useLanguage();
+  const { mood, reflection, language: genLanguage } = location.state || {};
+
+  const [souvenir, setSouvenir] = useState<GeneratedSouvenir | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isKeyMissing, setIsKeyMissing] = useState(false);
+  const [expandingId, setExpandingId] = useState<string | null>(null);
+
+  const fetchSouvenir = async () => {
+    setLoading(true);
+    setError(null);
+    setIsKeyMissing(false);
+    try {
+      const result = await generateSouvenir(mood, reflection || '', genLanguage || language);
+      setSouvenir(result);
+    } catch (err: any) {
+      console.error(err);
+      if (err.message === 'API_KEY_MISSING' || err.message.includes('API key not valid')) {
+        setIsKeyMissing(true);
+      }
+      setError(err.message || 'Failed to generate souvenir. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!mood) {
+      navigate('/entry', { replace: true });
+      return;
+    }
+
+    fetchSouvenir();
+  }, [mood, reflection, navigate, genLanguage, language]);
+
+  const handleSelectKey = async () => {
+    try {
+      if ((window as any).aistudio?.openSelectKey) {
+        await (window as any).aistudio.openSelectKey();
+        // After selecting, try again
+        fetchSouvenir();
+      } else {
+        alert(language === 'en' 
+          ? "Please configure your GEMINI_API_KEY in the Secrets panel." 
+          : "请在 Secrets 面板中配置您的 GEMINI_API_KEY。");
+      }
+    } catch (err) {
+      console.error("Failed to open key selection:", err);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!souvenir || !auth.currentUser) return;
+    setSaving(true);
+    try {
+      let finalSouvenir = { ...souvenir };
+
+      await addDoc(collection(db, 'souvenirs'), {
+        userId: auth.currentUser.uid,
+        ...finalSouvenir,
+        createdAt: serverTimestamp(),
+        isFavorited: false,
+      });
+      setSaved(true);
+      setTimeout(() => navigate('/museum'), 2000);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.CREATE, 'souvenirs');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleInquiry = async (inquiry: any) => {
+    if (!souvenir) return;
+    setExpandingId(inquiry.id);
+    try {
+      const response = await expandSouvenir(souvenir, inquiry[language], language);
+      const newExpansion = {
+        id: Date.now().toString(),
+        inquiryId: inquiry.id,
+        inquiryText: inquiry[language],
+        response,
+        createdAt: Date.now()
+      };
+      setSouvenir(prev => prev ? {
+        ...prev,
+        expansions: [...(prev.expansions || []), newExpansion]
+      } : null);
+    } catch (err) {
+      console.error(err);
+      alert(language === 'en' ? 'Failed to retrieve archive fragment.' : '无法提取档案碎片。');
+    } finally {
+      setExpandingId(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+        <div className="text-center space-y-12 max-w-md mx-auto relative">
+          {/* Atmospheric glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[var(--color-museum-accent)]/5 rounded-full blur-3xl animate-pulse" />
+          
+          <div className="relative w-32 h-32 mx-auto">
+            {/* Outer rotating ring */}
+            <div className="absolute inset-0 border-[1px] border-[var(--color-museum-border)] rounded-sm animate-[spin_10s_linear_infinite]" />
+            {/* Inner rotating ring */}
+            <div className="absolute inset-4 border-[1px] border-[var(--color-museum-accent)]/10 rounded-sm animate-[spin_15s_linear_infinite_reverse]" />
+            {/* Center pulsing core */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-[var(--color-museum-accent)] rounded-full animate-ping opacity-75" />
+              <div className="absolute w-1 h-1 bg-[var(--color-museum-accent)] rounded-full" />
+            </div>
+          </div>
+          
+          <div className="space-y-4 relative z-10">
+            <h2 className="font-serif text-xl tracking-[0.4em] uppercase text-[var(--color-museum-text)]/80 animate-pulse">
+              {language === 'en' ? 'Accessing Archives...' : '正在访问档案库...'}
+            </h2>
+            <div className="h-px w-8 bg-[var(--color-museum-accent)]/30 mx-auto" />
+            <p className="font-serif italic text-[var(--color-museum-muted)] text-sm tracking-widest">
+              {language === 'en' ? 'Retrieving exhibit from parallel timeline' : '正在从平行时间线提取展品'}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !souvenir) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center">
+        <div className="museum-card max-w-lg mx-auto shadow-2xl relative overflow-hidden bg-[#2a2421]">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-900/20 to-transparent" />
+          
+          <h2 className="font-serif text-3xl font-light text-[var(--color-museum-text)] mb-6 tracking-wide">
+            {language === 'en' ? 'A timeline fracture occurred' : '时间线发生了断裂'}
+          </h2>
+          <div className="h-px w-12 bg-[var(--color-museum-border)] mx-auto mb-6" />
+          <p className="text-[var(--color-museum-muted)] font-serif italic mb-12 text-lg leading-relaxed">
+            {isKeyMissing 
+              ? (language === 'en' 
+                  ? 'The museum curator needs a special key to access the archives. Please provide a Gemini API key.' 
+                  : '博物馆馆长需要一把特殊的钥匙来访问档案。请提供 Gemini API 密钥。')
+              : (error || (language === 'en' ? 'The souvenir could not be retrieved from the void.' : '无法从虚空中找回这件纪念品。'))}
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {isKeyMissing && (
+              <button 
+                onClick={handleSelectKey}
+                className="museum-button px-8 py-4 bg-[var(--color-museum-accent)]/10 text-[var(--color-museum-text)] border-[var(--color-museum-accent)]/30"
+              >
+                {language === 'en' ? 'Provide API Key' : '提供 API 密钥'}
+              </button>
+            )}
+            
+            <button 
+              onClick={() => navigate('/entry')} 
+              className="museum-button px-8 py-4 bg-transparent text-[var(--color-museum-text)] border-[var(--color-museum-border)]"
+            >
+              <ArrowLeft className="w-4 h-4 mr-3" /> {language === 'en' ? 'Return to Present' : '返回现在'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="gallery-corridor py-20">
+      <div className="max-w-5xl mx-auto px-6">
+        {/* The Display Case */}
+        <div className="relative">
+          {/* Spotlight from above */}
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[var(--color-museum-accent)]/10 blur-[100px] rounded-full pointer-events-none" />
+
+          <div className="bg-black/40 backdrop-blur-md border border-white/5 shadow-[0_40px_100px_rgba(0,0,0,0.8)] relative overflow-hidden">
+            {/* Glass reflection effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none z-20" />
+            
+            <div className="p-8 md:p-20 relative z-10">
+              {/* Archival Metadata Header */}
+              <div className="flex justify-between items-center border-b border-white/5 pb-6 mb-16 text-[9px] font-mono tracking-widest text-[var(--color-museum-muted)]/40 uppercase relative z-10">
+                <span>{language === 'en' ? 'Timeline: Divergent' : '时间线：发散'}</span>
+                <span className="hidden md:inline">
+                  {language === 'en' ? 'Gallery: ' : '展厅：'}
+                  <span className="text-[var(--color-museum-accent)]/80">{souvenir.themeRoom || (language === 'en' ? 'Unassigned' : '未分配')}</span>
+                </span>
+                <span>
+                  {language === 'en' ? 'Class: ' : '类别：'}
+                  <span className="text-[var(--color-museum-accent)]/80">{souvenir.objectType || 'Memory'}</span>
+                </span>
+              </div>
+
+              <div className="text-center space-y-10 mb-24 relative z-10">
+                <div className="inline-block">
+                  <p className="text-[10px] tracking-[0.5em] uppercase text-[var(--color-museum-accent)] font-medium mb-4">
+                    {souvenir.archiveNumber} / {souvenir.objectType}
+                  </p>
+                  <div className="h-px w-full bg-gradient-to-r from-transparent via-[var(--color-museum-accent)]/50 to-transparent" />
+                </div>
+                
+                <h1 className="font-serif text-5xl md:text-7xl font-light leading-tight tracking-[0.1em] text-[var(--color-museum-text)]">
+                  {souvenir.title}
+                </h1>
+                
+                <div className="flex items-center justify-center gap-6 max-w-3xl mx-auto pt-4">
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/10" />
+                  <p className="font-serif italic text-xl md:text-2xl text-[var(--color-museum-muted)]/80 text-center px-4">
+                    {souvenir.subtitle}
+                  </p>
+                  <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/10" />
+                </div>
+              </div>
+
+              <div className="max-w-3xl mx-auto relative">
+                {/* Subtle Watermark */}
+                <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[150%] pointer-events-none flex justify-center opacity-[0.015] select-none z-0">
+                  <span className="text-[12rem] font-serif whitespace-nowrap -rotate-6">{souvenir.place}</span>
+                </div>
+
+                <div className="relative z-10 pl-6 md:pl-10 border-l border-[var(--color-museum-accent)]/20 py-4 my-12">
+                  {/* Log Markers */}
+                  <div className="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-[var(--color-museum-accent)]/40" />
+                  <div className="absolute -left-[24px] top-0 text-[8px] font-mono text-[var(--color-museum-accent)]/40 -rotate-90 origin-right tracking-widest hidden md:block">
+                    LOG_START
+                  </div>
+                  
+                  <div className="prose prose-invert prose-p:font-serif prose-p:leading-[2.2] prose-p:text-[var(--color-museum-text)]/90 prose-p:text-xl">
+                    {(souvenir.narrative || '').split('\n').map((paragraph, i) => (
+                      <p key={i} className={paragraph.trim() ? 'mb-8' : ''}>
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+
+                  <div className="absolute -left-[5px] bottom-0 w-2 h-2 rounded-full bg-[var(--color-museum-accent)]/40" />
+                  <div className="absolute -left-[20px] bottom-0 text-[8px] font-mono text-[var(--color-museum-accent)]/40 -rotate-90 origin-right tracking-widest hidden md:block">
+                    LOG_END
+                  </div>
+                </div>
+
+                {/* Decorative Divider */}
+                <div className="flex items-center justify-center gap-6 py-24 opacity-30 relative z-10">
+                  <div className="h-px w-32 bg-gradient-to-r from-transparent to-[var(--color-museum-accent)]" />
+                  <div className="w-3 h-3 rotate-45 border border-[var(--color-museum-accent)]" />
+                  <div className="h-px w-32 bg-gradient-to-l from-transparent to-[var(--color-museum-accent)]" />
+                </div>
+
+                <div className="space-y-12 relative z-10">
+                  <div className="relative bg-black/20 p-10 md:p-16 border border-white/5 shadow-2xl">
+                    {/* Corner accents */}
+                    <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-[var(--color-museum-accent)]/40" />
+                    <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-[var(--color-museum-accent)]/40" />
+                    <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-[var(--color-museum-accent)]/40" />
+                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-[var(--color-museum-accent)]/40" />
+
+                    {/* Stamp */}
+                    <div className="absolute top-8 right-8 rotate-12 border border-[var(--color-museum-accent)]/20 text-[var(--color-museum-accent)]/20 text-[10px] tracking-[0.4em] uppercase px-3 py-1.5 font-mono rounded-sm hidden md:block select-none">
+                      {language === 'en' ? 'EXHIBIT_REF' : '展品档案'}
+                    </div>
+
+                    {/* Barcode */}
+                    <div className="absolute bottom-8 right-8 flex gap-[2px] opacity-20 hidden md:flex items-end">
+                      {['w-1', 'w-0.5', 'w-1', 'w-1', 'w-0.5', 'w-0.5', 'w-1', 'w-0.5', 'w-1', 'w-0.5'].map((width, i) => (
+                        <div key={i} className={`h-6 bg-[var(--color-museum-accent)] ${width}`} />
+                      ))}
+                      <span className="text-[8px] font-mono ml-2 tracking-widest text-[var(--color-museum-accent)]">SYS.OBJ</span>
+                    </div>
+
+                    <div>
+                      <h3 className="text-[10px] tracking-[0.3em] uppercase text-[var(--color-museum-accent)] mb-8 flex items-center gap-4">
+                        <span className="w-4 h-px bg-[var(--color-museum-accent)]/50"></span>
+                        {language === 'en' ? "Curator's Note" : '馆长手记'}
+                      </h3>
+                      <p className="font-serif italic text-[var(--color-museum-muted)] leading-relaxed text-lg pl-8 border-l border-white/5">
+                        {souvenir.curatorsNote}
+                      </p>
+                    </div>
+
+                    <div className="pt-12 mt-12 border-t border-white/5">
+                      <h3 className="text-[10px] tracking-[0.3em] uppercase text-[var(--color-museum-accent)] mb-8 flex items-center gap-4">
+                        <span className="w-4 h-px bg-[var(--color-museum-accent)]/50"></span>
+                        {language === 'en' ? 'Parallel Moment' : '平行瞬间'}
+                      </h3>
+                      <p className="font-serif text-[var(--color-museum-text)]/80 leading-relaxed pl-8">
+                        {souvenir.parallelMoment}
+                      </p>
+                    </div>
+
+                    <div className="pt-12 mt-12 border-t border-white/5">
+                      <h3 className="text-[10px] tracking-[0.3em] uppercase text-[var(--color-museum-accent)] mb-8 flex items-center gap-4">
+                        <span className="w-4 h-px bg-[var(--color-museum-accent)]/50"></span>
+                        {language === 'en' ? 'Archival Context' : '档案背景'}
+                      </h3>
+                      <p className="font-serif italic text-[var(--color-museum-muted)] leading-relaxed text-lg pl-8 border-l border-white/5">
+                        {souvenir.interpretation}
+                      </p>
+                    </div>
+
+                    <div className="pt-12 mt-12 border-t border-white/5">
+                      <h3 className="text-[10px] tracking-[0.3em] uppercase text-[var(--color-museum-accent)] mb-8 flex items-center gap-4">
+                        <span className="w-4 h-px bg-[var(--color-museum-accent)]/50"></span>
+                        {language === 'en' ? 'Mood Signatures' : '情绪签名'}
+                      </h3>
+                      <div className="flex flex-wrap gap-3 pl-8">
+                        {(souvenir.moodTags || []).map((tag, i) => (
+                          <span key={i} className="text-[9px] tracking-widest uppercase px-4 py-2 border border-white/10 text-[var(--color-museum-muted)] bg-white/5 rounded-sm">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Expansions / Curatorial Fragments */}
+                    {souvenir.expansions?.map((exp, idx) => (
+                      <div key={exp.id} className="mt-12 pt-12 border-t border-white/5 relative">
+                        <div className="absolute -left-[24px] top-12 text-[8px] font-mono text-[var(--color-museum-accent)]/40 -rotate-90 origin-right tracking-widest hidden md:block">
+                          ADDENDUM_0{idx + 1}
+                        </div>
+                        <h4 className="text-[10px] tracking-[0.3em] uppercase text-[var(--color-museum-accent)] mb-6 flex items-center gap-4">
+                          <span className="w-4 h-px bg-[var(--color-museum-accent)]/50"></span>
+                          {exp.inquiryText}
+                        </h4>
+                        <div className="prose prose-invert prose-p:font-serif prose-p:leading-[2.2] prose-p:text-[var(--color-museum-text)]/80 prose-p:text-lg pl-8 border-l border-[var(--color-museum-accent)]/10">
+                          {exp.response.split('\n').map((paragraph, i) => (
+                            <p key={i} className={paragraph.trim() ? 'mb-6' : ''}>
+                              {paragraph}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Further Investigation Buttons */}
+                  <div className="mt-24 pt-16 border-t border-[var(--color-museum-border)]">
+                    <h3 className="font-serif text-2xl text-[var(--color-museum-text)] mb-8 text-center">
+                      {language === 'en' ? 'Further Investigation' : '深入探索'}
+                    </h3>
+                    <div className="flex flex-col items-center gap-4">
+                      {INQUIRIES.filter(inq => !souvenir.expansions?.some(e => e.inquiryId === inq.id)).map(inquiry => (
+                        <button
+                          key={inquiry.id}
+                          onClick={() => handleInquiry(inquiry)}
+                          disabled={expandingId !== null}
+                          className="text-[11px] tracking-[0.3em] uppercase text-[var(--color-museum-muted)] hover:text-[var(--color-museum-accent)] transition-colors flex items-center gap-3 group disabled:opacity-50"
+                        >
+                          {expandingId === inquiry.id ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : (
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-museum-border)] group-hover:bg-[var(--color-museum-accent)] transition-colors" />
+                          )}
+                          {inquiry[language as 'en' | 'zh']}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-12 flex justify-center">
+                    <button
+                      onClick={handleSave}
+                      disabled={saving || saved}
+                      className={`museum-button px-10 py-5 gap-4 ${
+                        saved 
+                          ? 'bg-emerald-900/5 text-emerald-400/70 border-emerald-900/20' 
+                          : 'bg-transparent text-[var(--color-museum-text)] hover:shadow-[0_0_40px_rgba(197,168,122,0.1)]'
+                      }`}
+                    >
+                      {saving ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : saved ? (
+                        <>
+                          <BookmarkCheck className="w-5 h-5" />
+                          <span>{language === 'en' ? 'Archived' : '已归档'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Bookmark className="w-5 h-5" />
+                          <span>{language === 'en' ? 'Archive Souvenir' : '归档纪念品'}</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
